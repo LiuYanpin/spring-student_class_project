@@ -1,7 +1,7 @@
 package com.thoughtworks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.controller.UniClassController;
+import com.thoughtworks.bean.ThirdBean;
 import com.thoughtworks.domain.Student;
 import com.thoughtworks.domain.UniClass;
 import com.thoughtworks.repository.StudentStorage;
@@ -9,8 +9,13 @@ import com.thoughtworks.repository.UniClassStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -18,22 +23,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
 public class StudentControllerTest {
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
     @BeforeEach
     void setup() {
-        mockMvc = standaloneSetup(controller()).build();
+        mockMvc = webAppContextSetup(webApplicationContext).build();
         UniClassStorage.clear();
+        StudentStorage.clear();
     }
     @AfterEach
     void teardown() {
         UniClassStorage.clear();
-    }
-
-    private Object controller() {
-        return new UniClassController();
+        StudentStorage.clear();
     }
 
     @Test
@@ -99,5 +106,12 @@ public class StudentControllerTest {
         StudentStorage.putStudents(student1, student2, student3, student4);
         mockMvc.perform(get("/api/classes/1/students?age=20"))
                 .andExpect(status().isOk());
+    }
+
+    @Autowired
+    ThirdBean thirdBean;
+    @Test
+    void should_get_bean_message() {
+        assertThat(thirdBean.getBeanMessage().size()).isEqualTo(3);
     }
 }

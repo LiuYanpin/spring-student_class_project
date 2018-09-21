@@ -24,14 +24,23 @@ public class StudentStorage {
         Arrays.stream(students).forEach((student -> STUDENT.put(student.getId(), student)));
     }
 
-    public static Collection<Student> getStudentsByClassId(int classid) {
-        return STUDENT.values().stream().filter(student -> student.getClassId() == classid).collect(Collectors.toList());
+    public static Collection<Student> getStudentsByClassId(int classId) {
+        return STUDENT.values().stream().filter(student -> student.getClassId() == classId).collect(Collectors.toList());
     }
 
-    public static Collection<Student> getStudentsByClassIdAndLowestAge(int classid, Integer age_gt) {
+    public static Collection<Student> getStudentsByClassIdAndLowestAge(int classId, Integer lowestAge) {
         return STUDENT.values().stream()
-                .filter(student -> student.getClassId() == classid)
-                .filter(student -> student.getAge() > age_gt)
+                .filter(student -> student.getClassId() == classId && student.getAge() > lowestAge)
                 .collect(Collectors.toList());
+    }
+
+    public static Collection<Student> getStudentsByClassIdAndHighestAge(int classId, Integer highestAge) {
+        return STUDENT.values().stream()
+                .filter(student -> student.getClassId() == classId && student.getAge() < highestAge)
+                .collect(Collectors.toList());
+    }
+
+    public static void clear() {
+        STUDENT.clear();
     }
 }
